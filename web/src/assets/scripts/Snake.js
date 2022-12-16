@@ -135,13 +135,11 @@ export class Snake extends AcGameObject{
             if(Math.abs(a.x - b.x) < this.eps && Math.abs(a.y - b.y) <this.eps){
                 continue;
             }
-            console.log('status =', this.status);
-            console.log("a.x - b.x = ", Math.abs(a.x - b.x));
             if(Math.abs(a.x - b.x) < this.eps){
                 ctx.fillRect((a.x - 0.4) * L ,  Math.min(a.y, b.y) * L, L * 0.8, Math.abs(a.y - b.y) * L);
             }
             else{
-                ctx.fillRect(Math.min(a.x, b.x) * L, (a.y - 0.4) * L, Math.abs(a.x - b.x) * L, L  * 0.8 );
+                ctx.fillRect( Math.min(a.x, b.x) * L, (a.y - 0.4) * L, Math.abs(a.x - b.x) * L, L  * 0.8 );
             }
         }
 
@@ -149,7 +147,6 @@ export class Snake extends AcGameObject{
         for(let i = 0; i < 2; i++){
             const eye_x = (this.cells[0].x + this.eye_dx[this.eye_direction][i] * 0.15) * L;
             const eye_y = (this.cells[0].y + this.eye_dy[this.eye_direction][i] * 0.15) * L ;
-            console.log(eye_x, eye_y);
             ctx.beginPath();
             ctx.arc(eye_x, eye_y, L * 0.05, 0, Math.PI * 2);
             ctx.fill();

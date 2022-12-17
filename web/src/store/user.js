@@ -21,6 +21,9 @@ export default {
         updateToken(state, token){
             state.token = token;
         },
+        updateLogin(state, login){
+            state.is_login = login;
+        },
 
         logout(state){
             state.id = "";

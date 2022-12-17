@@ -1,7 +1,7 @@
 <template>
     <ContentField>
         登录: 
-        <div class="row justify-content-md-center">
+        <div class="row justify-content-md-center" v-if="!$store.state.user.pulling_info">
             <div class="col-3">
                 <form @submit.prevent="login">
                     <div class="mb-3">
@@ -36,6 +36,23 @@ export default {
         let password = ref('');
         let error_message = ref('');
 
+        const jwt_token = localStorage.getItem("jwt_token");
+        if(jwt_token){
+            store.commit("updateToken",jwt_token);
+            store.dispatch("getinfo",{
+                success(){
+                    store.dispatch("pulling_info", true);
+                    router.push({name: 'home_index'});
+                },
+                error(){
+                    store.dispatch("pulling_info", true);
+                }
+            })
+        }
+        else{
+            store.dispatch("pulling_info", false);
+        }
+
         const login = () => {
             store.dispatch("login",{ //如果想调用全局变量store里面的action的函数的话 用dispatch
                 username: username.value,
@@ -44,9 +61,8 @@ export default {
                 success(){
                     store.dispatch("getinfo", {
                         success(){
+                            
                             router.push({name: "home_index"});
-                            console.log(store.state.user);
-                            console.log(111);
                         }
                         
                     })

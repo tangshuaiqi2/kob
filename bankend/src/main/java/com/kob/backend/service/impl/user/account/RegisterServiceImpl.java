@@ -27,35 +27,35 @@ public class RegisterServiceImpl implements RegisterService {
 		Map<String, String> map = new HashMap<>();
 
 		if(username.length() == 0){
-			map.put("error_massage", "用户名不能为空");
+			map.put("error_message", "用户名不能为空");
 			return map;
 		}
 		if(password == null || confirmedPassword == null){
-			map.put("error_massage", "密码不能为空");
+			map.put("error_message", "密码不能为空");
 			return map;
 		}
 		username.trim();
 
 		if(password.length() == 0){
-			map.put("error_massage", "密码不能为空");
+			map.put("error_message", "密码不能为空");
 			return map;
 		}
 
 		if(username.length() == 0){
-			map.put("error_massage", "用户名不能为空");
+			map.put("error_message", "用户名不能为空");
 			return map;
 		}
 
 		if(username.length() > 100){
-			map.put("error_massage", "用户名最多100个字符");
+			map.put("error_message", "用户名最多100个字符");
 			return map;
 		}
 		if(password.length() > 100){
-			map.put("error_massage", "密码最多100个字符");
+			map.put("error_message", "密码最多100个字符");
 			return map;
 		}
 		if(!password.equals(confirmedPassword)){
-			map.put("error_massage", "两次输入的密码不一致");
+			map.put("error_message", "两次输入的密码不一致");
 			return map;
 		}
 

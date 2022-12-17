@@ -7,6 +7,7 @@ export default {
         photo: "",
         token: "",
         is_login: false,
+        pulling_info: true,
     },
     getters: {
     },
@@ -27,6 +28,11 @@ export default {
             state.photo = "";
             state.token = "";
             state.is_login = false;
+            // state.pulling_info = false;
+        },
+
+        pulling_info(state,pulling_info){
+            state.pulling_info = pulling_info;
         }
         
     },
@@ -41,6 +47,7 @@ export default {
                 } ,
                 success(resp){
                     if(resp.error_message === 'success'){
+                        localStorage.setItem("jwt_token", resp.token);
                         console.log(resp);
                         context.commit("updateToken", resp.token);//如果想调用全局变量中的 mutations函数的话 用commit
                         data.success(resp);
@@ -77,8 +84,14 @@ export default {
             });
         },
 
+        pulling_info(context, pulling_info){
+            context.commit("pulling_info",pulling_info);
+        },
+
         logout(context){
+            localStorage.removeItem("jwt_token");
             context.commit("logout");
+            location.reload();
         }
     },
     modules: {

@@ -3,11 +3,12 @@ import { Wall } from "./Wall";
 import { Snake } from './Snake';
 
 export class GameMap extends AcGameObject{
-    constructor(ctx, parent){
+    constructor(ctx, parent, store){
         super();
 
         this.ctx = ctx;
         this.parent = parent;
+        this.store = store;
         this.L = 0;
 
         this.rows = 13;
@@ -43,36 +44,7 @@ export class GameMap extends AcGameObject{
     }
 
     create_walls(){
-        const g = [];
-        for(let r = 0; r < this.rows; r++){
-            g[r] = [];
-            for(let c = 0; c < this.cols; c++){
-                g[r][c] = false;
-            }
-        }
-        for(let r = 0;  r < this.rows; r++){
-            g[r][0] = g[r][this.cols-1] = true;
-        }
-
-        for(let c = 0; c < this.cols; c++){
-            g[0][c] = g[this.rows - 1][c] = true;
-        }
-        // g[this.cols - 1][0] = g[0][this.rows - 1] = 0
-        // 创建随机障碍物
-        for(let i = 0; i < this.inner_walls_count; i++){
-            for(let j = 0; j < 1000; j++){
-                let r = parseInt(Math.random() * this.rows);
-                let c = parseInt(Math.random() * this.cols); 
-                if(r == this.cols - 2 && c == 1 || r == 1 && c == this.rows - 2) continue;
-                if(g[r][c] || g[this.rows - 1 - r][this.cols - 1  - c]) continue;
-                g[r][c] = g[this.rows - 1 - r][this.cols - 1 - c] = true;
-                break;
-            }
-        }
-
-        const copy_g = JSON.parse(JSON.stringify(g));
-
-        if(!this.check_connectivity(copy_g, this.rows - 2, 1, 1, this.cols - 2)) return false;
+        const g = this.store.state.pk.gamemap;
 
         for(let r = 0; r < this.rows; r++){
             for(let c = 0; c < this.cols; c++){
@@ -100,11 +72,7 @@ export class GameMap extends AcGameObject{
     }
 
     start() {
-        for(let i = 0; i < 1000; i ++){
-            if(this.create_walls()){
-                break;
-            }
-        }
+        this.create_walls();
         this.add_listening_events();
         
     }

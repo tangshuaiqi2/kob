@@ -66,6 +66,6 @@ public class AddServiceImpl implements AddService {
 		map.put("error_message", "success");
 
 
-		return null;
+		return map;
 	}
 }

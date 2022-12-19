@@ -70,7 +70,7 @@ const routes = [
     name: "user_bot_index",
     component: UserBotIndexView,
     meta: {
-      requestAuth: false,
+      requestAuth: true,
     }
   },
   {

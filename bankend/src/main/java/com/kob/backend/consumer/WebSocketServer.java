@@ -3,9 +3,12 @@ package com.kob.backend.consumer;
 import com.alibaba.fastjson.JSONObject;
 import com.kob.backend.consumer.utils.Game;
 import com.kob.backend.consumer.utils.JwtAuthentication;
+import com.kob.backend.mapper.RecordMapper;
 import com.kob.backend.mapper.UserMapper;
+import com.kob.backend.pojo.Record;
 import com.kob.backend.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.RecoverableDataAccessException;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -20,18 +23,26 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @ServerEndpoint("/websocket/{token}")  // 注意不要以'/'结尾
 public class WebSocketServer {
 
-	final private static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>();
+	public final static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>();
 
-	final private static CopyOnWriteArraySet<User> matchpool = new CopyOnWriteArraySet<>();
+	private final static CopyOnWriteArraySet<User> matchpool = new CopyOnWriteArraySet<>();
 
 	private User user;
 	private Session session = null;
 
-	private static  UserMapper userMapper;
+	public static  UserMapper userMapper;
+	public static RecordMapper recordMapper;
+
+	private Game game = null;
 
 	@Autowired
 	public void setUserMapper(UserMapper userMapper){
 		WebSocketServer.userMapper = userMapper;
+	}
+
+	@Autowired
+	public void setRecordMapper(RecordMapper recordMapper){
+		WebSocketServer.recordMapper = recordMapper;
 	}
 
 	@OnOpen
@@ -64,14 +75,28 @@ public class WebSocketServer {
 			matchpool.remove(a);
 			matchpool.remove(b);
 
-			Game game = new Game(13,14,20);
+			Game game = new Game(13,14,20, a.getId(), b.getId());
 			game.createMap();
+
+			game.start();
+
+			users.get(a.getId()).game = game;
+			users.get(b.getId()).game = game;
+
+			JSONObject gamemap = new JSONObject();
+			gamemap.put("a_id", game.getPlayA().getId());
+			gamemap.put("a_sx", game.getPlayA().getSx());
+			gamemap.put("a_sy", game.getPlayA().getSy());
+			gamemap.put("b.id", game.getPlayB().getId());
+			gamemap.put("b_sx", game.getPlayB().getSx());
+			gamemap.put("b_sy", game.getPlayA().getSy());
+			gamemap.put("map", game.getG());
 
 			JSONObject respA = new JSONObject();
 			respA.put("event", "start-pk");
 			respA.put("opponent_username", b.getUsername());
 			respA.put("opponent_photo", b.getPhoto());
-			respA.put("gamemap", game.getG());
+			respA.put("game", gamemap);
 			users.get(a.getId()).sendMessage(respA.toJSONString());
 
 
@@ -79,7 +104,7 @@ public class WebSocketServer {
 			respB.put("event", "start-pk");
 			respB.put("opponent_username", a.getUsername());
 			respB.put("opponent_photo", a.getPhoto());
-			respB.put("gamemap", game.getG());
+			respB.put("game", gamemap);
 			users.get(b.getId()).sendMessage(respB.toJSONString());
 
 		}
@@ -100,6 +125,15 @@ public class WebSocketServer {
 			users.remove(this.user.getId());
 			matchpool.remove(this.user);
 		}
+
+	}
+
+	private void move(int direction){
+		if(game.getPlayA().getId().equals(user.getId())){
+			game.setNextStepA(direction);
+		}else if(game.getPlayB().getId().equals(user.getId())){
+			game.setNextStepB(direction);
+		}
 	}
 
 	@OnMessage
@@ -112,6 +146,8 @@ public class WebSocketServer {
 			startMatcing();
 		}else if("stop-matching".equals(event)){
 			stopMatcing();
+		}else if("move".equals(event)){
+			move(data.getInteger("direction"));
 		}
 	}
 

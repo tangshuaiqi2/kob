@@ -34,7 +34,7 @@
                                     <div class="mb-3">
                                         <label for="add-bot-code" class="form-label">Bot的代码</label>
                                         <VAceEditor
-                                            v-model="botadd.content"
+                                            v-model:value="botadd.content"
                                             @init="editorInit"
                                             lang="c_cpp"
                                             theme="textmate"
@@ -87,11 +87,13 @@
                                                     <div class="mb-3">
                                                         <label for="add-bot-code" class="form-label">Bot的代码</label>
                                                         <VAceEditor
-                                                            v-model="bot.content"
+                                                            v-model:value="bot.content"
                                                             @init="editorInit"
                                                             lang="c_cpp"
                                                             theme="textmate"
-                                                            style="height: 300px" />
+                                                            style="height: 300px">
+                                                            
+                                                            </VAceEditor>
                                                     </div>
                                                     
                                                 </div>
@@ -133,7 +135,7 @@ export default {
 
         ace.config.set(
             "basePath", 
-            "https://cdn.jsdelivr.net/npm/ace-builds@" + require('ace-builds').version + "/src-noconflict/")
+            "https://cdn.jsdelivr.net/npm/ace-builds@" + require('ace-builds').version + "/src-noconflict/");
         const store = useStore();
         let bots = ref([]);
         
@@ -176,14 +178,14 @@ export default {
                 },
                 success(resp){
                     if(resp.error_message === "success"){
-
+                        
                         botadd.title="";
                         botadd.description="";
                         botadd.content=""; 
                         Modal.getInstance("#add-bot-btn");
                         refresh_bots();
                     }else{
-                        console.log(resp);
+                        console.log(botadd);
                         botadd.error_message = resp.error_message;
                     }
                 },

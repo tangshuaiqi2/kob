@@ -28,6 +28,8 @@ export default {
 
         let socket = null;
 
+        store.commit("updateLoser", "none"); 
+
         onMounted(()=>{
             socket = new WebSocket(socketUrl);
            
